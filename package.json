@@ -1,5 +1,5 @@
 {
-  "name": "kitchen-sink",
+  "name": "hurlinglabs-gql-llm-tools",
   "private": true,
   "scripts": {
     "build": "turbo run build",
