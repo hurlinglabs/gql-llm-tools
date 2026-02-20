@@ -15,7 +15,12 @@ export {
   type GraphQLSchemaExplorerOptions,
 } from "./schema-explorer";
 export { GraphQLSchemaExplorerFromLookups } from "./schema-explorer-from-lookups";
-export { saveLookups, loadLookups } from "./save-load-lookups";
+export {
+  saveLookups,
+  loadLookups,
+  serializeLookups,
+  deserializeLookups,
+} from "./save-load-lookups";
 
 export type {
   TypeKind,
