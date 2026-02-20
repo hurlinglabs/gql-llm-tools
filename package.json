@@ -9,13 +9,17 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "check-types": "turbo run check-types",
+    "validate": "turbo run build check-types lint && pnpm -r --filter='@hurling/gql-schema-explorer' --filter='@repo/logger' --filter='@repo/eslint-config' --filter='@repo/typescript-config' --filter='@repo/jest-presets' exec pnpm publint && pnpm exec attw --pack packages/gql-schema-explorer && pnpm exec attw --pack packages/logger",
     "prepare": "husky"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.2",
+    "@manypkg/cli": "^0.25.1",
     "eslint": "^9.39.0",
     "husky": "^9.1.7",
     "node-notifier": "^10.0.1",
     "prettier": "^3.6.0",
+    "publint": "^0.3.17",
     "turbo": "^2.8.10"
   },
   "packageManager": "pnpm@8.15.6",

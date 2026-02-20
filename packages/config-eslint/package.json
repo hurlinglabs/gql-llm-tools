@@ -7,7 +7,6 @@
     ".": "./index.js",
     "./next": "./next.js",
     "./react": "./react.js",
-    "./remix": "./remix.js",
     "./vite": "./vite.js"
   },
   "devDependencies": {

@@ -26,6 +26,10 @@
     "dev": "bunchee --watch",
     "lint": "eslint src/",
     "check-types": "tsc --noEmit",
+    "publint": "publint",
+    "attw": "attw",
+    "manypkg": "manypkg check",
+    "check": "pnpm build && pnpm check-types && pnpm publint && pnpm attw",
     "test": "jest"
   },
   "jest": {
