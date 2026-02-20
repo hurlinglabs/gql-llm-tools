@@ -1,10 +1,10 @@
 {
-  "tasks": [
-    {
+  "extends": ["//"],
+  "tasks": {
+    "build": {
       "cache": false,
       "inputs": ["./src/**"],
-      "name": "build",
       "outputs": ["./dist/**"]
     }
-  ]
+  }
 }

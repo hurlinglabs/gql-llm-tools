@@ -1,0 +1,46 @@
+#!/bin/sh
+
+# Cross-platform notification
+notify() {
+    if command -v node-notifier >/dev/null 2>&1; then
+        node -e "require('node-notifier').notify({title: 'Pre-commit', message: '$1'})"
+    fi
+}
+
+# Get list of staged files BEFORE any changes
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|tsx)$' | tr '\n' ' ')
+
+if [ -z "$STAGED_FILES" ]; then
+    echo "No staged TypeScript files to format"
+    exit 0
+fi
+
+notify "Running pre-commit checks..."
+
+# 1. Fix prettier for changed files
+echo "Running prettier..."
+pnpm prettier --write $STAGED_FILES
+
+# Re-stage any fixes (files were modified by prettier)
+git add $STAGED_FILES
+
+# 2. Run TypeScript check
+notify "Running pre-commit checks...TS check"
+echo "Running TypeScript check..."
+if ! pnpm check-types; then
+    notify "Pre-commit checks FAILED ✗"
+    echo "TypeScript check failed"
+    exit 1
+fi
+
+# 3. Run ESLint
+notify "Running pre-commit checks...ESLint check"
+echo "Running ESLint..."
+if ! pnpm lint; then
+    notify "Pre-commit checks FAILED ✗"
+    echo "ESLint check failed"
+    exit 1
+fi
+
+notify "Pre-commit checks passed ✓"
+echo "All pre-commit checks passed"
