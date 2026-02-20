@@ -1,6 +1,7 @@
 import {
   parse,
   buildASTSchema,
+  buildClientSchema,
   GraphQLSchema,
   GraphQLObjectType,
   GraphQLInputObjectType,
@@ -21,6 +22,7 @@ import {
   isUnionType,
   isScalarType,
   GraphQLType,
+  IntrospectionQuery,
 } from "graphql";
 
 import type {
@@ -298,9 +300,20 @@ export function deserializeSymbolIndex(
   return result;
 }
 
-export function buildLookups(schemaSDL: string): SchemaLookups {
+export function buildLookupsFromSDL(schemaSDL: string): SchemaLookups {
   const ast = parse(schemaSDL);
   const schema = buildASTSchema(ast);
+  return buildLookupsFromSchema(schema);
+}
+
+export function buildLookupsFromIntrospection(
+  introspection: IntrospectionQuery,
+): SchemaLookups {
+  const schema = buildClientSchema(introspection);
+  return buildLookupsFromSchema(schema);
+}
+
+function buildLookupsFromSchema(schema: GraphQLSchema): SchemaLookups {
   const typeIndex = buildTypeIndex(schema);
   const symbolIndex = buildSymbolIndex(typeIndex, schema);
 

@@ -2,7 +2,7 @@ import { describe, it, expect } from "@jest/globals";
 import {
   GraphQLSchemaExplorer,
   GraphQLSchemaExplorerFromLookups,
-  buildLookups,
+  buildLookupsFromSDL,
 } from "..";
 
 const TEST_SCHEMA = `
@@ -115,7 +115,7 @@ describe("GraphQLSchemaExplorer", () => {
 
 describe("GraphQLSchemaExplorerFromLookups", () => {
   it("loads from pre-built lookups", () => {
-    const lookups = buildLookups(TEST_SCHEMA);
+    const lookups = buildLookupsFromSDL(TEST_SCHEMA);
     const explorer = new GraphQLSchemaExplorerFromLookups(lookups);
 
     const typeIndex = explorer.getTypeIndex();
@@ -123,7 +123,7 @@ describe("GraphQLSchemaExplorerFromLookups", () => {
   });
 
   it("retrieveContext works with pre-built lookups", () => {
-    const lookups = buildLookups(TEST_SCHEMA);
+    const lookups = buildLookupsFromSDL(TEST_SCHEMA);
     const explorer = new GraphQLSchemaExplorerFromLookups(lookups);
     const context = explorer.retrieveContext("user");
 
@@ -131,7 +131,7 @@ describe("GraphQLSchemaExplorerFromLookups", () => {
   });
 
   it("getLookups returns original lookups", () => {
-    const lookups = buildLookups(TEST_SCHEMA);
+    const lookups = buildLookupsFromSDL(TEST_SCHEMA);
     const explorer = new GraphQLSchemaExplorerFromLookups(lookups);
     const retrievedLookups = explorer.getLookups();
 

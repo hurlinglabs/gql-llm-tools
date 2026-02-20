@@ -1,5 +1,6 @@
 export {
-  buildLookups,
+  buildLookupsFromSDL,
+  buildLookupsFromIntrospection,
   tokenize,
   singularize,
   serializeTypeIndex,
