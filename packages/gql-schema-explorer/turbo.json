@@ -1,0 +1,10 @@
+{
+  "tasks": [
+    {
+      "cache": false,
+      "inputs": ["./src/**"],
+      "name": "build",
+      "outputs": ["./dist/**"]
+    }
+  ]
+}
