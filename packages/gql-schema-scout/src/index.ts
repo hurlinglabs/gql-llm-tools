@@ -11,11 +11,7 @@ export {
   formatTypesForLLM,
 } from "./build-lookups";
 export type { SchemaLookups } from "./types";
-export {
-  GraphQLSchemaExplorer,
-  type GraphQLSchemaExplorerOptions,
-} from "./schema-explorer";
-export { GraphQLSchemaExplorerFromLookups } from "./schema-explorer-from-lookups";
+export { GQLSchemaScout } from "./gql-schema-scout";
 export {
   saveLookups,
   loadLookups,

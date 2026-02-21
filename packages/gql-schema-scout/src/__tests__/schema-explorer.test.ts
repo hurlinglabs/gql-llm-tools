@@ -1,9 +1,5 @@
 import { describe, it, expect } from "@jest/globals";
-import {
-  GraphQLSchemaExplorer,
-  GraphQLSchemaExplorerFromLookups,
-  buildLookupsFromSDL,
-} from "..";
+import { GQLSchemaScout, buildLookupsFromSDL } from "..";
 
 const TEST_SCHEMA = `
 type Query {
@@ -45,49 +41,49 @@ input UpdateUserInput {
 }
 `;
 
-describe("GraphQLSchemaExplorer", () => {
-  describe("constructor", () => {
+describe("GQLSchemaScout", () => {
+  describe("fromSDL", () => {
     it("parses SDL and builds indices", () => {
-      const explorer = new GraphQLSchemaExplorer({ sdl: TEST_SCHEMA });
+      const scout = GQLSchemaScout.fromSDL(TEST_SCHEMA);
 
-      const typeIndex = explorer.getTypeIndex();
+      const typeIndex = scout.getTypeIndex();
       expect(typeIndex.size).toBeGreaterThan(0);
     });
   });
 
   describe("retrieveContext", () => {
     it("retrieves User type when querying user", () => {
-      const explorer = new GraphQLSchemaExplorer({ sdl: TEST_SCHEMA });
-      const context = explorer.retrieveContext("user");
+      const scout = GQLSchemaScout.fromSDL(TEST_SCHEMA);
+      const context = scout.retrieveContext("user");
 
       expect(context).toContain("## Type: User");
     });
 
     it("retrieves Post type when querying posts", () => {
-      const explorer = new GraphQLSchemaExplorer({ sdl: TEST_SCHEMA });
-      const context = explorer.retrieveContext("posts");
+      const scout = GQLSchemaScout.fromSDL(TEST_SCHEMA);
+      const context = scout.retrieveContext("posts");
 
       expect(context).toContain("## Type: Post");
     });
 
     it("includes Query and Mutation types", () => {
-      const explorer = new GraphQLSchemaExplorer({ sdl: TEST_SCHEMA });
-      const context = explorer.retrieveContext("anything");
+      const scout = GQLSchemaScout.fromSDL(TEST_SCHEMA);
+      const context = scout.retrieveContext("anything");
 
       expect(context).toContain("Query");
       expect(context).toContain("Mutation");
     });
 
     it("expands to referenced types", () => {
-      const explorer = new GraphQLSchemaExplorer({ sdl: TEST_SCHEMA });
-      const context = explorer.retrieveContext("posts");
+      const scout = GQLSchemaScout.fromSDL(TEST_SCHEMA);
+      const context = scout.retrieveContext("posts");
 
       expect(context).toContain("User");
     });
 
     it("retrieves input types when querying mutations", () => {
-      const explorer = new GraphQLSchemaExplorer({ sdl: TEST_SCHEMA });
-      const context = explorer.retrieveContext("create user");
+      const scout = GQLSchemaScout.fromSDL(TEST_SCHEMA);
+      const context = scout.retrieveContext("create user");
 
       expect(context).toContain("CreateUserInput");
     });
@@ -95,15 +91,15 @@ describe("GraphQLSchemaExplorer", () => {
 
   describe("getSDL", () => {
     it("returns the original SDL", () => {
-      const explorer = new GraphQLSchemaExplorer({ sdl: TEST_SCHEMA });
-      expect(explorer.getSDL()).toBe(TEST_SCHEMA);
+      const scout = GQLSchemaScout.fromSDL(TEST_SCHEMA);
+      expect(scout.getSDL()).toBe(TEST_SCHEMA);
     });
   });
 
   describe("getLookups", () => {
     it("returns serializable lookups", () => {
-      const explorer = new GraphQLSchemaExplorer({ sdl: TEST_SCHEMA });
-      const lookups = explorer.getLookups();
+      const scout = GQLSchemaScout.fromSDL(TEST_SCHEMA);
+      const lookups = scout.getLookups();
 
       expect(lookups.typeIndex).toBeDefined();
       expect(lookups.symbolIndex).toBeDefined();
@@ -111,30 +107,30 @@ describe("GraphQLSchemaExplorer", () => {
       expect(lookups.mutationTypeName).toBe("Mutation");
     });
   });
-});
 
-describe("GraphQLSchemaExplorerFromLookups", () => {
-  it("loads from pre-built lookups", () => {
-    const lookups = buildLookupsFromSDL(TEST_SCHEMA);
-    const explorer = new GraphQLSchemaExplorerFromLookups(lookups);
+  describe("fromLookups", () => {
+    it("loads from pre-built lookups", () => {
+      const lookups = buildLookupsFromSDL(TEST_SCHEMA);
+      const scout = GQLSchemaScout.fromLookups(lookups);
 
-    const typeIndex = explorer.getTypeIndex();
-    expect(typeIndex.size).toBeGreaterThan(0);
-  });
+      const typeIndex = scout.getTypeIndex();
+      expect(typeIndex.size).toBeGreaterThan(0);
+    });
 
-  it("retrieveContext works with pre-built lookups", () => {
-    const lookups = buildLookupsFromSDL(TEST_SCHEMA);
-    const explorer = new GraphQLSchemaExplorerFromLookups(lookups);
-    const context = explorer.retrieveContext("user");
+    it("retrieveContext works with pre-built lookups", () => {
+      const lookups = buildLookupsFromSDL(TEST_SCHEMA);
+      const scout = GQLSchemaScout.fromLookups(lookups);
+      const context = scout.retrieveContext("user");
 
-    expect(context).toContain("## Type: User");
-  });
+      expect(context).toContain("## Type: User");
+    });
 
-  it("getLookups returns original lookups", () => {
-    const lookups = buildLookupsFromSDL(TEST_SCHEMA);
-    const explorer = new GraphQLSchemaExplorerFromLookups(lookups);
-    const retrievedLookups = explorer.getLookups();
+    it("getLookups returns original lookups", () => {
+      const lookups = buildLookupsFromSDL(TEST_SCHEMA);
+      const scout = GQLSchemaScout.fromLookups(lookups);
+      const retrievedLookups = scout.getLookups();
 
-    expect(retrievedLookups.queryTypeName).toBe("Query");
+      expect(retrievedLookups.queryTypeName).toBe("Query");
+    });
   });
 });

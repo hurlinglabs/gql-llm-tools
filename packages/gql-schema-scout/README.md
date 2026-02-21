@@ -19,7 +19,7 @@ npm install @hurling/gql-schema-scout
 ## Quick Start
 
 ```typescript
-import { GraphQLSchemaExplorer } from "@hurling/gql-schema-scout";
+import { GQLSchemaScout } from "@hurling/gql-schema-scout";
 
 const sdl = `
   type Query {
@@ -42,10 +42,10 @@ const sdl = `
   }
 `;
 
-const explorer = new GraphQLSchemaExplorer({ sdl });
+const scout = GQLSchemaScout.fromSDL(sdl);
 
 // Get relevant context for a user query
-const context = explorer.retrieveContext("user");
+const context = scout.retrieveContext("user");
 console.log(context);
 ```
 
@@ -100,10 +100,10 @@ The library tokenizes your input, searches the symbol index for matching types, 
 ### Basic: From SDL
 
 ```typescript
-import { GraphQLSchemaExplorer } from "@hurling/gql-schema-scout";
+import { GQLSchemaScout } from "@hurling/gql-schema-scout";
 
-const explorer = new GraphQLSchemaExplorer({ sdl: yourSchemaSDL });
-const context = explorer.retrieveContext("create new post");
+const scout = GQLSchemaScout.fromSDL(yourSchemaSDL);
+const context = scout.retrieveContext("create new post");
 ```
 
 ### Advanced: Pre-built Lookups
@@ -121,20 +121,17 @@ saveLookups({ lookups, filePath: "./schema-lookups.json" });
 Then load at runtime:
 
 ```typescript
-import {
-  loadLookups,
-  GraphQLSchemaExplorerFromLookups,
-} from "@hurling/gql-schema-scout";
+import { loadLookups, GQLSchemaScout } from "@hurling/gql-schema-scout";
 
 const lookups = loadLookups({ filePath: "./schema-lookups.json" });
-const explorer = new GraphQLSchemaExplorerFromLookups(lookups);
-const context = explorer.retrieveContext("fetch posts");
+const scout = GQLSchemaScout.fromLookups(lookups);
+const context = scout.retrieveContext("fetch posts");
 ```
 
 ### From Introspection JSON
 
 ```typescript
-import { buildLookupsFromIntrospection } from "@hurling/gql-schema-scout";
+import { GQLSchemaScout } from "@hurling/gql-schema-scout";
 
 // Fetch introspection from your endpoint
 const response = await fetch("https://your-api.com/graphql", {
@@ -144,42 +141,33 @@ const response = await fetch("https://your-api.com/graphql", {
 });
 const introspection = await response.json();
 
-const lookups = buildLookupsFromIntrospection(introspection);
-const explorer = new GraphQLSchemaExplorerFromLookups(lookups);
+const scout = GQLSchemaScout.fromIntrospection(introspection);
 ```
 
 ## API Reference
 
-### `GraphQLSchemaExplorer`
+### `GQLSchemaScout`
 
-Main class for schema exploration.
+Main class for schema exploration with fluent static factory methods.
 
 ```typescript
-const explorer = new GraphQLSchemaExplorer({ sdl: string });
+// From SDL string
+const scout = GQLSchemaScout.fromSDL(sdl);
+
+// From introspection result
+const scout = GQLSchemaScout.fromIntrospection(introspection);
+
+// From pre-built lookups
+const scout = GQLSchemaScout.fromLookups(lookups);
 ```
 
-**Methods:**
+**Instance Methods:**
 
 - `retrieveContext(userInput: string): string` - Get relevant schema types
 - `getTypeIndex(): TypeIndex` - Access raw type index
 - `getSymbolIndex(): SymbolIndex` - Access symbol index
-- `getSDL(): string` - Get original SDL
+- `getSDL(): string` - Get original SDL (only available if created with fromSDL)
 - `getLookups(): SchemaLookups` - Get serializable lookups
-
-### `GraphQLSchemaExplorerFromLookups`
-
-Lightweight explorer from pre-built lookups.
-
-```typescript
-const explorer = new GraphQLSchemaExplorerFromLookups(lookups);
-```
-
-**Methods:**
-
-- `retrieveContext(userInput: string): string`
-- `getTypeIndex(): TypeIndex`
-- `getSymbolIndex(): SymbolIndex`
-- `getLookups(): SchemaLookups`
 
 ### Build Functions
 
@@ -206,7 +194,7 @@ Generate relevant schema context for function definitions:
 
 ```typescript
 function getSchemaContext(userPrompt: string): string {
-  return explorer.retrieveContext(userPrompt);
+  return scout.retrieveContext(userPrompt);
 }
 
 // Prompt: "How do I create a new blog post?"
