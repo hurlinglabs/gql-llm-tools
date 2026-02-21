@@ -9,7 +9,11 @@ export {
   deserializeSymbolIndex,
   retrieveRelevantTypes,
 } from "./build-lookups";
-export type { SchemaLookups } from "./types";
+export type {
+  SchemaLookups,
+  RetrieveOptions,
+  RelevantSchemaInfo,
+} from "./build-lookups";
 export { GQLSchemaScout } from "./gql-schema-scout";
 export { SchemaResult } from "./schema-result";
 export {

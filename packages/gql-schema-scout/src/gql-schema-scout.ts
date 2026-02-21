@@ -8,6 +8,7 @@ import {
   deserializeTypeIndex,
   deserializeSymbolIndex,
   retrieveRelevantTypes,
+  type RetrieveOptions,
 } from "./build-lookups";
 import { SchemaResult } from "./schema-result";
 import type { SchemaLookups, TypeIndex, SymbolIndex } from "./types";
@@ -97,13 +98,17 @@ export class GQLSchemaScout {
    * Retrieve relevant schema types for a natural language query
    * Returns a SchemaResult that can be formatted as SDL or minified
    */
-  retrieveRelevantSchema(userInput: string): SchemaResult {
+  retrieveRelevantSchema(
+    userInput: string,
+    options?: RetrieveOptions,
+  ): SchemaResult {
     const relevantTypes = retrieveRelevantTypes(
       userInput,
       this.typeIndex,
       this.symbolIndex,
       this.queryTypeName,
       this.mutationTypeName,
+      options,
     );
     return new SchemaResult(relevantTypes, this.typeIndex);
   }

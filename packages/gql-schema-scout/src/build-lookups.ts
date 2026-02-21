@@ -1,29 +1,29 @@
-import {
-  parse,
-  buildASTSchema,
-  buildClientSchema,
-  GraphQLSchema,
-  GraphQLObjectType,
-  GraphQLInputObjectType,
-  GraphQLEnumType,
-  GraphQLInterfaceType,
-  GraphQLUnionType,
-  GraphQLScalarType,
+import type {
+  GraphQLArgument,
   GraphQLField,
   GraphQLInputField,
-  GraphQLArgument,
-  isNonNullType,
-  isListType,
-  getNamedType,
-  isObjectType,
-  isInputObjectType,
-  isEnumType,
-  isInterfaceType,
-  isUnionType,
-  isScalarType,
+  GraphQLInputObjectType,
+  GraphQLInterfaceType,
+  GraphQLObjectType,
+  GraphQLSchema,
   GraphQLType,
+  GraphQLUnionType,
   IntrospectionQuery,
 } from "graphql";
+import {
+  buildSchema,
+  parse,
+  isScalarType,
+  isObjectType,
+  isInputObjectType,
+  isInterfaceType,
+  isUnionType,
+  isEnumType,
+  isNonNullType,
+  isListType,
+  isNamedType,
+} from "graphql";
+import { buildASTSchema, buildClientSchema } from "graphql/utilities";
 
 import type {
   TypeKind,
@@ -32,10 +32,65 @@ import type {
   TypeNode,
   TypeIndex,
   SymbolIndex,
+  SchemaLookups,
   SerializedTypeIndex,
   SerializedSymbolIndex,
-  SchemaLookups,
 } from "./types";
+export type { SchemaLookups } from "./types";
+
+/**
+ * Options for controlling how relevant types are retrieved.
+ * All options are optional - defaults are applied if not specified.
+ */
+export type RetrieveOptions = {
+  /**
+   * Minimum score threshold for a type to be included.
+   * Types with scores below this value are filtered out.
+   * @default 0 (no threshold filtering)
+   */
+  minScore?: number;
+
+  /**
+   * Maximum number of types to return (by score).
+   * If not specified, all types above minScore are returned.
+   */
+  maxResults?: number;
+
+  /**
+   * Whether to include Query and Mutation root types.
+   * Only matching fields will be included from these types.
+   * @default false
+   */
+  includeRootTypes?: boolean;
+
+  /**
+   * Whether to include types referenced by matched types.
+   * Referenced types will be listed but not fully expanded.
+   * @default true
+   */
+  includeReferences?: boolean;
+
+  /**
+   * Whether to split camelCase words into individual tokens.
+   * e.g., "BetNotification" → ["bet", "notification"]
+   * @default false
+   */
+  splitCamelCase?: boolean;
+};
+
+/**
+ * Result of retrieving relevant schema types with categorization
+ */
+export type RelevantSchemaInfo = {
+  /** Types that directly matched the user's query - full definition included */
+  primaryTypes: Set<string>;
+  /** Query/Mutation types - only matching fields included */
+  rootTypes: Set<string>;
+  /** Types referenced by primary types - listed but not expanded */
+  referencedTypes: Set<string>;
+  /** User tokens used for matching (for filtering root type fields) */
+  matchedTokens: Set<string>;
+};
 
 const BUILTIN_SCALARS = new Set(["String", "Int", "Float", "Boolean", "ID"]);
 
@@ -68,7 +123,7 @@ export function singularize(word: string): string {
   return word;
 }
 
-export function tokenize(name: string): string[] {
+export function tokenize(name: string, splitCamelCase = false): string[] {
   const tokens: string[] = [];
 
   const words = name.toLowerCase().split(/[\s\-_.,;!?()[\]{}]+/);
@@ -76,21 +131,27 @@ export function tokenize(name: string): string[] {
   for (const word of words) {
     if (!word || word.length < 2) continue;
 
-    let current = "";
-    for (let i = 0; i < word.length; i++) {
-      const char = word[i];
-      if (
-        char === char.toUpperCase() &&
-        char !== char.toLowerCase() &&
-        current.length > 0
-      ) {
-        if (current) tokens.push(current);
-        current = char.toLowerCase();
-      } else {
-        current += char;
+    if (splitCamelCase) {
+      // Split camelCase: "BetNotification" → ["betnotification"]
+      let current = "";
+      for (let i = 0; i < word.length; i++) {
+        const char = word[i];
+        if (
+          char === char.toUpperCase() &&
+          char !== char.toLowerCase() &&
+          current.length > 0
+        ) {
+          if (current) tokens.push(current);
+          current = char.toLowerCase();
+        } else {
+          current += char;
+        }
       }
+      if (current) tokens.push(current);
+    } else {
+      // Keep as-is
+      tokens.push(word);
     }
-    if (current) tokens.push(current);
   }
 
   const result: string[] = [...tokens];
@@ -333,51 +394,121 @@ function buildLookupsFromSchema(schema: GraphQLSchema): SchemaLookups {
   };
 }
 
+// Score constants for weighted matching
+const SCORE_EXACT_MATCH = 100;
+const SCORE_PREFIX_MATCH = 50;
+const SCORE_CONTAINS_MATCH = 25;
+const SCORE_FIELD_MATCH = 10;
+
+function calculateMatchScore(token: string, match: string): number {
+  const matchLower = match.toLowerCase();
+  const tokenLower = token.toLowerCase();
+
+  // Exact match (e.g., "user" matches "User")
+  if (matchLower === tokenLower) {
+    return SCORE_EXACT_MATCH;
+  }
+
+  // Prefix match (e.g., "user" matches "UserProfile")
+  if (matchLower.startsWith(tokenLower)) {
+    return SCORE_PREFIX_MATCH;
+  }
+
+  // Contains match (e.g., "user" matches "CurrentUser")
+  if (matchLower.includes(tokenLower)) {
+    return SCORE_CONTAINS_MATCH;
+  }
+
+  return 0;
+}
+
 export function retrieveRelevantTypes(
   userInput: string,
   typeIndex: TypeIndex,
   symbolIndex: SymbolIndex,
   queryTypeName: string | null,
   mutationTypeName: string | null,
-): Set<string> {
-  const userTokens = tokenize(userInput);
-  const candidateTypes = new Set<string>();
+  options?: RetrieveOptions,
+): RelevantSchemaInfo {
+  const {
+    minScore = 0,
+    maxResults,
+    includeRootTypes = false,
+    includeReferences = true,
+    splitCamelCase = false,
+  } = options ?? {};
+
+  // Score each type by relevance
+  const typeScores = new Map<string, number>();
+  const userTokens = tokenize(userInput, splitCamelCase);
+  const matchedTokens = new Set(userTokens.map((t) => t.toLowerCase()));
 
   for (const token of userTokens) {
-    const matches = symbolIndex.get(token.toLowerCase());
+    const tokenLower = token.toLowerCase();
+    const matches = symbolIndex.get(tokenLower);
+
     if (matches) {
       for (const match of Array.from(matches)) {
-        if (match.includes(".")) {
-          const [typeName] = match.split(".");
-          candidateTypes.add(typeName);
-        } else {
-          candidateTypes.add(match);
+        const [typeName, fieldName] = match.includes(".")
+          ? match.split(".")
+          : [match, null];
+
+        const score = fieldName
+          ? SCORE_FIELD_MATCH
+          : calculateMatchScore(token, typeName);
+
+        // Accumulate scores for types that match multiple tokens
+        const currentScore = typeScores.get(typeName) ?? 0;
+        typeScores.set(typeName, currentScore + score);
+      }
+    }
+  }
+
+  // Filter by minimum score
+  let filteredTypes = Array.from(typeScores.entries())
+    .filter(([, score]) => score >= minScore)
+    .sort((a, b) => b[1] - a[1]); // Sort by score descending
+
+  // Apply max results limit
+  if (maxResults !== undefined) {
+    filteredTypes = filteredTypes.slice(0, maxResults);
+  }
+
+  const primaryTypes = new Set(filteredTypes.map(([name]) => name));
+
+  // Expand to referenced types
+  const referencedTypes = new Set<string>();
+
+  if (includeReferences) {
+    for (const typeName of Array.from(primaryTypes)) {
+      const typeNode = typeIndex.get(typeName);
+      if (typeNode) {
+        for (const refType of typeNode.referencedTypes) {
+          if (typeIndex.has(refType) && !primaryTypes.has(refType)) {
+            referencedTypes.add(refType);
+          }
         }
       }
     }
   }
 
-  const expandedTypes = new Set<string>(candidateTypes);
-
-  for (const typeName of Array.from(candidateTypes)) {
-    const typeNode = typeIndex.get(typeName);
-    if (typeNode) {
-      for (const refType of typeNode.referencedTypes) {
-        if (typeIndex.has(refType)) {
-          expandedTypes.add(refType);
-        }
-      }
+  // Root types (Query/Mutation)
+  const rootTypes = new Set<string>();
+  if (includeRootTypes) {
+    if (queryTypeName && typeIndex.has(queryTypeName)) {
+      rootTypes.add(queryTypeName);
+    }
+    if (mutationTypeName && typeIndex.has(mutationTypeName)) {
+      rootTypes.add(mutationTypeName);
     }
   }
 
-  if (queryTypeName) {
-    expandedTypes.add(queryTypeName);
-  }
-  if (mutationTypeName) {
-    expandedTypes.add(mutationTypeName);
-  }
-
-  return expandedTypes;
+  return {
+    primaryTypes,
+    rootTypes,
+    referencedTypes,
+    matchedTokens,
+  };
 }
 
 export function formatTypesForLLM(
