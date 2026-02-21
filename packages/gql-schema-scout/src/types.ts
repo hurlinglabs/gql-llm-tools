@@ -29,12 +29,14 @@ export type ArgNode = {
   name: string;
   type: string;
   required: boolean;
+  description?: string;
 };
 
 export type FieldNode = {
   name: string;
   returnType: string;
   args: ArgNode[];
+  description?: string;
 };
 
 export type TypeNode = {
@@ -43,6 +45,7 @@ export type TypeNode = {
   fields?: FieldNode[];
   interfaces?: string[];
   referencedTypes: string[];
+  description?: string;
 };
 
 export type TypeIndex = Map<string, TypeNode>;

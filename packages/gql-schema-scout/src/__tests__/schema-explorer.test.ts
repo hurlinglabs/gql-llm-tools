@@ -51,41 +51,42 @@ describe("GQLSchemaScout", () => {
     });
   });
 
-  describe("retrieveContext", () => {
+  describe("retrieveRelevantSchema", () => {
     it("retrieves User type when querying user", () => {
       const scout = GQLSchemaScout.fromSDL(TEST_SCHEMA);
-      const context = scout.retrieveContext("user");
+      const result = scout.retrieveRelevantSchema("user");
 
-      expect(context).toContain("## Type: User");
+      expect(result.asSDLString()).toContain("type User");
     });
 
     it("retrieves Post type when querying posts", () => {
       const scout = GQLSchemaScout.fromSDL(TEST_SCHEMA);
-      const context = scout.retrieveContext("posts");
+      const result = scout.retrieveRelevantSchema("posts");
 
-      expect(context).toContain("## Type: Post");
+      expect(result.asSDLString()).toContain("type Post");
     });
 
     it("includes Query and Mutation types", () => {
       const scout = GQLSchemaScout.fromSDL(TEST_SCHEMA);
-      const context = scout.retrieveContext("anything");
+      const result = scout.retrieveRelevantSchema("anything");
 
-      expect(context).toContain("Query");
-      expect(context).toContain("Mutation");
+      const sdl = result.asSDLString();
+      expect(sdl).toContain("type Query");
+      expect(sdl).toContain("type Mutation");
     });
 
     it("expands to referenced types", () => {
       const scout = GQLSchemaScout.fromSDL(TEST_SCHEMA);
-      const context = scout.retrieveContext("posts");
+      const result = scout.retrieveRelevantSchema("posts");
 
-      expect(context).toContain("User");
+      expect(result.asSDLString()).toContain("User");
     });
 
     it("retrieves input types when querying mutations", () => {
       const scout = GQLSchemaScout.fromSDL(TEST_SCHEMA);
-      const context = scout.retrieveContext("create user");
+      const result = scout.retrieveRelevantSchema("create user");
 
-      expect(context).toContain("CreateUserInput");
+      expect(result.asSDLString()).toContain("CreateUserInput");
     });
   });
 
@@ -117,12 +118,12 @@ describe("GQLSchemaScout", () => {
       expect(typeIndex.size).toBeGreaterThan(0);
     });
 
-    it("retrieveContext works with pre-built lookups", () => {
+    it("retrieveRelevantSchema works with pre-built lookups", () => {
       const lookups = buildLookupsFromSDL(TEST_SCHEMA);
       const scout = GQLSchemaScout.fromLookups(lookups);
-      const context = scout.retrieveContext("user");
+      const result = scout.retrieveRelevantSchema("user");
 
-      expect(context).toContain("## Type: User");
+      expect(result.asSDLString()).toContain("type User");
     });
 
     it("getLookups returns original lookups", () => {

@@ -144,6 +144,7 @@ export function buildTypeIndex(schema: GraphQLSchema): TypeIndex {
               name: arg.name,
               type: argTypeStr,
               required: isNonNullType(arg.type),
+              description: arg.description ?? undefined,
             });
           }
         }
@@ -152,6 +153,7 @@ export function buildTypeIndex(schema: GraphQLSchema): TypeIndex {
           name: fieldName,
           returnType,
           args,
+          description: graphQLField.description ?? undefined,
         });
       }
 
@@ -187,6 +189,7 @@ export function buildTypeIndex(schema: GraphQLSchema): TypeIndex {
               name: arg.name,
               type: argTypeStr,
               required: isNonNullType(arg.type),
+              description: arg.description ?? undefined,
             });
           }
         }
@@ -194,6 +197,7 @@ export function buildTypeIndex(schema: GraphQLSchema): TypeIndex {
           name: fieldName,
           returnType,
           args,
+          description: graphQLField.description ?? undefined,
         });
       }
     } else if (isUnionType(type)) {
@@ -214,6 +218,7 @@ export function buildTypeIndex(schema: GraphQLSchema): TypeIndex {
       fields,
       interfaces,
       referencedTypes: Array.from(referencedTypes),
+      description: type.description ?? undefined,
     });
   }
 

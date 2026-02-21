@@ -8,10 +8,10 @@ export {
   serializeSymbolIndex,
   deserializeSymbolIndex,
   retrieveRelevantTypes,
-  formatTypesForLLM,
 } from "./build-lookups";
 export type { SchemaLookups } from "./types";
 export { GQLSchemaScout } from "./gql-schema-scout";
+export { SchemaResult } from "./schema-result";
 export {
   saveLookups,
   loadLookups,

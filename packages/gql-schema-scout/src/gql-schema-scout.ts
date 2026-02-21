@@ -8,8 +8,8 @@ import {
   deserializeTypeIndex,
   deserializeSymbolIndex,
   retrieveRelevantTypes,
-  formatTypesForLLM,
 } from "./build-lookups";
+import { SchemaResult } from "./schema-result";
 import type { SchemaLookups, TypeIndex, SymbolIndex } from "./types";
 
 /**
@@ -95,8 +95,9 @@ export class GQLSchemaScout {
 
   /**
    * Retrieve relevant schema types for a natural language query
+   * Returns a SchemaResult that can be formatted as SDL or minified
    */
-  retrieveContext(userInput: string): string {
+  retrieveRelevantSchema(userInput: string): SchemaResult {
     const relevantTypes = retrieveRelevantTypes(
       userInput,
       this.typeIndex,
@@ -104,7 +105,16 @@ export class GQLSchemaScout {
       this.queryTypeName,
       this.mutationTypeName,
     );
-    return formatTypesForLLM(relevantTypes, this.typeIndex);
+    return new SchemaResult(relevantTypes, this.typeIndex);
+  }
+
+  /**
+   * Retrieve relevant schema types as a formatted string (legacy method)
+   * @deprecated Use retrieveRelevantSchema() instead
+   */
+  retrieveContext(userInput: string): string {
+    const schemaResult = this.retrieveRelevantSchema(userInput);
+    return schemaResult.asSDLString();
   }
 
   /**
