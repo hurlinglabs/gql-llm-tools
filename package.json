@@ -9,7 +9,7 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "check-types": "turbo run check-types",
-    "validate": "turbo run build check-types lint && pnpm -r --filter='@hurling/gql-schema-explorer' --filter='@repo/logger' --filter='@repo/eslint-config' --filter='@repo/typescript-config' --filter='@repo/jest-presets' exec pnpm publint && pnpm exec attw --pack packages/gql-schema-explorer && pnpm exec attw --pack packages/logger",
+    "validate": "turbo run build check-types lint && pnpm -r exec pnpm publint && pnpm exec attw --pack packages/gql-schema-scout",
     "prepare": "husky"
   },
   "devDependencies": {

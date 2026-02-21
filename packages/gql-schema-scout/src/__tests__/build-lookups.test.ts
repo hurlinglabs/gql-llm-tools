@@ -62,7 +62,7 @@ interface Node {
 union SearchResult = User | Post
 `;
 
-describe("@hurling/gql-schema-explorer", () => {
+describe("@hurling/gql-schema-scout", () => {
   describe("tokenize", () => {
     it("splits on non-alphanumeric characters", () => {
       expect(tokenize("created_at")).toContain("created");

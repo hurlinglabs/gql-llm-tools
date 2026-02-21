@@ -1,0 +1,240 @@
+# @hurling/gql-schema-scout
+
+A lightweight GraphQL schema exploration library designed for LLM/AI applications. It enables intelligent, context-aware retrieval of schema types based on natural language queries.
+
+## Features
+
+- **Semantic Schema Retrieval** - Pass a natural language query and get relevant GraphQL types
+- **Multiple Input Sources** - Parse from SDL (Schema Definition Language) or introspection JSON
+- **Optimized for LLMs** - Output formatted specifically for AI consumption
+- **Serializable Lookups** - Pre-compute and cache schema lookups for fast initialization
+- **TypeScript Support** - Full type definitions included
+
+## Installation
+
+```bash
+npm install @hurling/gql-schema-scout
+```
+
+## Quick Start
+
+```typescript
+import { GraphQLSchemaExplorer } from "@hurling/gql-schema-scout";
+
+const sdl = `
+  type Query {
+    user(id: ID!): User
+    users(limit: Int): [User!]!
+    posts(authorId: ID): [Post!]!
+  }
+
+  type User {
+    id: ID!
+    name: String!
+    email: String!
+    posts: [Post!]!
+  }
+
+  type Post {
+    id: ID!
+    title: String!
+    author: User!
+  }
+`;
+
+const explorer = new GraphQLSchemaExplorer({ sdl });
+
+// Get relevant context for a user query
+const context = explorer.retrieveContext("user");
+console.log(context);
+```
+
+Output:
+
+```markdown
+## Type: Query (Object)
+
+Fields:
+
+- user(id: ID!): User
+- users(limit: Int): [User!]!
+- posts(authorId: ID): [Post!]!
+
+## Type: User (Object)
+
+Fields:
+
+- id: ID!
+- name: String!
+- email: String!
+- posts: [Post!]!
+  References: Post, Query
+```
+
+## Core Concepts
+
+### Type Index
+
+The type index maps type names to structured `TypeNode` objects containing:
+
+- `name` - The type's name
+- `kind` - Object, Input, Enum, Interface, or Union
+- `fields` - Array of fields with args and return types
+- `interfaces` - Interfaces implemented (for Object types)
+- `referencedTypes` - Types referenced by fields
+
+### Symbol Index
+
+A reverse index mapping tokens (words from type/field names) to type names. Enables fuzzy matching:
+
+- `user` → `User`, `Query`
+- `users` → `User`, `Query` (singularized)
+- `post` → `Post`, `Query`
+
+### Context Retrieval
+
+The library tokenizes your input, searches the symbol index for matching types, and expands to include referenced types. This gives you exactly what you need - no more, no less.
+
+## Usage Patterns
+
+### Basic: From SDL
+
+```typescript
+import { GraphQLSchemaExplorer } from "@hurling/gql-schema-scout";
+
+const explorer = new GraphQLSchemaExplorer({ sdl: yourSchemaSDL });
+const context = explorer.retrieveContext("create new post");
+```
+
+### Advanced: Pre-built Lookups
+
+For better performance, pre-compute lookups at build time:
+
+```typescript
+import { buildLookupsFromSDL, saveLookups } from "@hurling/gql-schema-scout";
+
+// Build once, save to file
+const lookups = buildLookupsFromSDL(schemaSDL);
+saveLookups({ lookups, filePath: "./schema-lookups.json" });
+```
+
+Then load at runtime:
+
+```typescript
+import {
+  loadLookups,
+  GraphQLSchemaExplorerFromLookups,
+} from "@hurling/gql-schema-scout";
+
+const lookups = loadLookups({ filePath: "./schema-lookups.json" });
+const explorer = new GraphQLSchemaExplorerFromLookups(lookups);
+const context = explorer.retrieveContext("fetch posts");
+```
+
+### From Introspection JSON
+
+```typescript
+import { buildLookupsFromIntrospection } from "@hurling/gql-schema-scout";
+
+// Fetch introspection from your endpoint
+const response = await fetch("https://your-api.com/graphql", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ query: "{ __schema { ... } }" }),
+});
+const introspection = await response.json();
+
+const lookups = buildLookupsFromIntrospection(introspection);
+const explorer = new GraphQLSchemaExplorerFromLookups(lookups);
+```
+
+## API Reference
+
+### `GraphQLSchemaExplorer`
+
+Main class for schema exploration.
+
+```typescript
+const explorer = new GraphQLSchemaExplorer({ sdl: string });
+```
+
+**Methods:**
+
+- `retrieveContext(userInput: string): string` - Get relevant schema types
+- `getTypeIndex(): TypeIndex` - Access raw type index
+- `getSymbolIndex(): SymbolIndex` - Access symbol index
+- `getSDL(): string` - Get original SDL
+- `getLookups(): SchemaLookups` - Get serializable lookups
+
+### `GraphQLSchemaExplorerFromLookups`
+
+Lightweight explorer from pre-built lookups.
+
+```typescript
+const explorer = new GraphQLSchemaExplorerFromLookups(lookups);
+```
+
+**Methods:**
+
+- `retrieveContext(userInput: string): string`
+- `getTypeIndex(): TypeIndex`
+- `getSymbolIndex(): SymbolIndex`
+- `getLookups(): SchemaLookups`
+
+### Build Functions
+
+- `buildLookupsFromSDL(sdl: string): SchemaLookups` - Build from SDL
+- `buildLookupsFromIntrospection(introspection: IntrospectionQuery): SchemaLookups` - Build from introspection
+
+### Serialization Functions
+
+- `serializeLookups(lookups: SchemaLookups): string` - Convert to JSON string
+- `deserializeLookups(data: string): SchemaLookups` - Parse from JSON string
+- `saveLookups(options: SaveLookupsOptions): void` - Save to file
+- `loadLookups(options: LoadLookupsOptions): SchemaLookups` - Load from file
+
+### Utility Functions
+
+- `tokenize(name: string): string[]` - Split name into searchable tokens
+- `singularize(word: string): string` - Convert plural to singular
+
+## Use Cases
+
+### LLM Function Calling
+
+Generate relevant schema context for function definitions:
+
+```typescript
+function getSchemaContext(userPrompt: string): string {
+  return explorer.retrieveContext(userPrompt);
+}
+
+// Prompt: "How do I create a new blog post?"
+const context = getSchemaContext("create blog post");
+// Returns: CreatePost mutation, Post type, CreatePostInput type
+```
+
+### IDE Autocomplete
+
+Power intelligent autocomplete:
+
+```typescript
+function getSuggestions(partial: string): string[] {
+  const context = explorer.retrieveContext(partial);
+  // Parse and offer field suggestions
+}
+```
+
+### API Documentation
+
+Generate contextual docs:
+
+```typescript
+function generateDocs(query: string): string {
+  return explorer.retrieveContext(query);
+}
+```
+
+## License
+
+MIT

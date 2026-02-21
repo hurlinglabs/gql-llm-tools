@@ -1,5 +1,5 @@
 {
-  "name": "@hurling/gql-schema-explorer",
+  "name": "@hurling/gql-schema-scout",
   "version": "0.0.0",
   "type": "module",
   "private": true,
