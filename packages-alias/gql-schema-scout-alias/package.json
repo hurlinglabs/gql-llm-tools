@@ -1,8 +1,9 @@
 {
-  "name": "@hurling/gql-schema-scout",
+  "name": "gql-schema-scout",
   "version": "0.0.1",
   "license": "Apache-2.0",
   "type": "module",
+  "description": "Alias for @hurling/gql-schema-scout - WARNING: This is an alias package. Please use @hurling/gql-schema-scout for new projects. CLI users should install @hurling/gql-schema-scout directly.",
   "repository": "github:hurlinglabs/gql-llm-tools",
   "homepage": "https://github.com/hurlinglabs/gql-llm-tools/tree/main/packages/gql-schema-scout",
   "bugs": "https://github.com/hurlinglabs/gql-llm-tools/issues",
@@ -12,9 +13,6 @@
   "main": "./dist/es/index.js",
   "module": "./dist/es/index.js",
   "types": "./dist/es/index.d.ts",
-  "bin": {
-    "gql-scout": "./dist/es/cli.js"
-  },
   "exports": {
     ".": {
       "import": {
@@ -25,35 +23,21 @@
         "types": "./dist/cjs/index.d.cts",
         "default": "./dist/cjs/index.cjs"
       }
-    },
-    "./cli": {
-      "import": {
-        "types": "./dist/es/cli.d.ts",
-        "default": "./dist/es/cli.js"
-      },
-      "require": {
-        "types": "./dist/cjs/cli.d.cts",
-        "default": "./dist/cjs/cli.cjs"
-      }
     }
   },
   "scripts": {
+    "preinstall": "echo -e \"$(cat ./preinstall-alert.txt)\"",
     "build": "bunchee",
     "dev": "bunchee --watch",
     "lint": "eslint src/",
     "check-types": "tsc --noEmit",
-    "publint": "publint",
-    "attw": "attw",
-    "manypkg": "manypkg check",
-    "check": "pnpm build && pnpm check-types && pnpm publint && pnpm attw",
     "test": "jest"
   },
-  "jest": {
-    "preset": "@repo/jest-presets/node"
+  "peerDependencies": {
+    "@hurling/gql-schema-scout": "workspace:*"
   },
   "dependencies": {
-    "commander": "^12.0.0",
-    "graphql": "^16.10.0"
+    "@hurling/gql-schema-scout": "workspace:*"
   },
   "devDependencies": {
     "@jest/globals": "^30.2.0",

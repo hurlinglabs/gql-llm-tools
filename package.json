@@ -9,7 +9,7 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "check-types": "turbo run check-types",
-    "validate": "turbo run build check-types lint && pnpm -r exec pnpm publint && pnpm exec attw --pack packages/gql-schema-scout",
+    "validate": "turbo run build check-types lint && pnpm -r exec pnpm publint && ./scripts/validate-packages.sh",
     "prepare": "husky"
   },
   "devDependencies": {

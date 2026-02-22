@@ -1,9 +1,11 @@
 {
-  "name": "@repo/eslint-config",
+  "name": "@hurling/gql-llm-tools-config-eslint",
   "version": "0.0.0",
   "license": "MIT",
   "type": "module",
-  "private": true,
+  "repository": "github:hurlinglabs/gql-llm-tools",
+  "homepage": "https://github.com/hurlinglabs/gql-llm-tools/tree/main/packages/config-eslint",
+  "bugs": "https://github.com/hurlinglabs/gql-llm-tools/issues",
   "exports": {
     ".": "./index.js",
     "./next": "./next.js",

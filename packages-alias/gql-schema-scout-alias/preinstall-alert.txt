@@ -1,0 +1,7 @@
+
+=================================================================
+\x1b[33m  WARNING: gql-schema-scout is a alias for @hurling/gql-schema-scout!\x1b[0m
+  This package is an alias for @hurling/gql-schema-scout.
+  This alias will receive updates but is recomended for new projects
+  to use @hurling/gql-schema-scout directly
+=================================================================
