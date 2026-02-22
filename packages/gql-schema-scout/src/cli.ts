@@ -13,10 +13,7 @@ program
 
 program
   .argument("[query]", "Natural language query to search the schema")
-  .argument(
-    "[schema]",
-    "Path to GraphQL schema file or URL (default: GitHub schema)",
-  )
+  .requiredOption("-s, --schema <path>", "Path to GraphQL schema file or URL")
   .option("-m, --minScore <number>", "Minimum relevance score", "0")
   .option("-r, --maxResults <number>", "Maximum number of types to return")
   .option("--splitCamelCase", "Split camelCase words into tokens")
@@ -27,13 +24,14 @@ program
   )
   .option("--noComments", "Don't search within field/type descriptions")
   .option("--output <type>", "Output format: sdl|minified", "sdl")
-  .action(async (query, schema, options) => {
+  .action(async (query, options) => {
     const SCHEMA_PATH =
-      schema || "https://docs.github.com/public/fpt/schema.docs.graphql";
+      options.schema ||
+      "https://docs.github.com/public/fpt/schema.docs.graphql";
 
     if (!query) {
       console.error("Error: Query is required");
-      console.error("Usage: gql-scout <query> [schema]");
+      console.error("Usage: gql-scout [options] [query]");
       process.exit(1);
     }
 
