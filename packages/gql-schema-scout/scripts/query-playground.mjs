@@ -125,14 +125,16 @@ async function main() {
 
   console.log("\n" + "=".repeat(50));
   console.log("\nSUMMARY:");
-  const sdlPercent = ((sdlOutput.length / sdl.length) * 100).toFixed(1);
-  const minPercent = ((minifiedOutput.length / sdl.length) * 100).toFixed(1);
+  const sdlPct = ((sdlOutput.length / sdl.length) * 100).toFixed(1);
+  const minPct = ((minifiedOutput.length / sdl.length) * 100).toFixed(1);
+  const sdlReduction = (100 - parseFloat(sdlPct)).toFixed(1);
+  const minReduction = (100 - parseFloat(minPct)).toFixed(1);
   console.log(`  Original SDL:    ${sdl.length.toLocaleString()} chars`);
   console.log(
-    `  asSDLString():   ${sdlOutput.length.toLocaleString()} chars (${sdlPercent}% of original)`,
+    `  asSDLString():   ${sdlOutput.length.toLocaleString()} chars ${sdlPct}% of original (${sdlReduction}% reduction)`,
   );
   console.log(
-    `  asMinified():    ${minifiedOutput.length.toLocaleString()} chars (${minPercent}% of original)`,
+    `  asMinified():    ${minifiedOutput.length.toLocaleString()} chars ${minPct}% of original (${minReduction}% reduction)`,
   );
 }
 
