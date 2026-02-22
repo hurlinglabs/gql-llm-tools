@@ -32,9 +32,11 @@ import type {
   TypeNode,
   TypeIndex,
   SymbolIndex,
+  CommentIndex,
   SchemaLookups,
   SerializedTypeIndex,
   SerializedSymbolIndex,
+  SerializedCommentIndex,
 } from "./types";
 export type { SchemaLookups } from "./types";
 
@@ -76,6 +78,13 @@ export type RetrieveOptions = {
    * @default false
    */
   splitCamelCase?: boolean;
+
+  /**
+   * Whether to search within field, type, and argument descriptions/comments.
+   * When enabled, query terms that match descriptions will also be considered relevant.
+   * @default true
+   */
+  searchWithinComments?: boolean;
 };
 
 /**
@@ -289,14 +298,22 @@ export function buildTypeIndex(schema: GraphQLSchema): TypeIndex {
 export function buildSymbolIndex(
   typeIndex: TypeIndex,
   schema: GraphQLSchema,
-): SymbolIndex {
+): { symbolIndex: SymbolIndex; commentIndex: CommentIndex } {
   const symbolIndex: SymbolIndex = new Map();
+  const commentIndex: CommentIndex = new Map();
 
   const addSymbol = (token: string, target: string) => {
     if (!symbolIndex.has(token)) {
       symbolIndex.set(token, new Set());
     }
     symbolIndex.get(token)!.add(target);
+  };
+
+  const addCommentToken = (token: string, target: string) => {
+    if (!commentIndex.has(token)) {
+      commentIndex.set(token, new Set());
+    }
+    commentIndex.get(token)!.add(target);
   };
 
   const queryType = schema.getQueryType();
@@ -318,6 +335,13 @@ export function buildSymbolIndex(
       addSymbol(token, typeName);
     }
 
+    if (typeNode.description) {
+      const descTokens = tokenize(typeNode.description);
+      for (const token of descTokens) {
+        addCommentToken(token, typeName);
+      }
+    }
+
     if (typeNode.fields) {
       for (const field of typeNode.fields) {
         const fieldTokens = tokenize(field.name);
@@ -325,11 +349,31 @@ export function buildSymbolIndex(
           addSymbol(token, `${typeName}.${field.name}`);
           addSymbol(token, typeName);
         }
+
+        if (field.description) {
+          const descTokens = tokenize(field.description);
+          for (const token of descTokens) {
+            addCommentToken(token, `${typeName}.${field.name}`);
+            addCommentToken(token, typeName);
+          }
+        }
+
+        if (field.args) {
+          for (const arg of field.args) {
+            if (arg.description) {
+              const argDescTokens = tokenize(arg.description);
+              for (const token of argDescTokens) {
+                addCommentToken(token, `${typeName}.${field.name}`);
+                addCommentToken(token, typeName);
+              }
+            }
+          }
+        }
       }
     }
   }
 
-  return symbolIndex;
+  return { symbolIndex, commentIndex };
 }
 
 export function serializeTypeIndex(typeIndex: TypeIndex): SerializedTypeIndex {
@@ -366,6 +410,26 @@ export function deserializeSymbolIndex(
   return result;
 }
 
+export function serializeCommentIndex(
+  commentIndex: CommentIndex,
+): SerializedCommentIndex {
+  const result: SerializedCommentIndex = {};
+  for (const [key, value] of Array.from(commentIndex)) {
+    result[key] = Array.from(value);
+  }
+  return result;
+}
+
+export function deserializeCommentIndex(
+  serialized: SerializedCommentIndex,
+): CommentIndex {
+  const result: CommentIndex = new Map();
+  for (const [key, value] of Object.entries(serialized)) {
+    result.set(key, new Set(value));
+  }
+  return result;
+}
+
 export function buildLookupsFromSDL(schemaSDL: string): SchemaLookups {
   const ast = parse(schemaSDL);
   const schema = buildASTSchema(ast);
@@ -381,7 +445,7 @@ export function buildLookupsFromIntrospection(
 
 function buildLookupsFromSchema(schema: GraphQLSchema): SchemaLookups {
   const typeIndex = buildTypeIndex(schema);
-  const symbolIndex = buildSymbolIndex(typeIndex, schema);
+  const { symbolIndex, commentIndex } = buildSymbolIndex(typeIndex, schema);
 
   const queryType = schema.getQueryType();
   const mutationType = schema.getMutationType();
@@ -389,6 +453,7 @@ function buildLookupsFromSchema(schema: GraphQLSchema): SchemaLookups {
   return {
     typeIndex: serializeTypeIndex(typeIndex),
     symbolIndex: serializeSymbolIndex(symbolIndex),
+    commentIndex: serializeCommentIndex(commentIndex),
     queryTypeName: queryType?.name ?? null,
     mutationTypeName: mutationType?.name ?? null,
   };
@@ -429,6 +494,7 @@ export function retrieveRelevantTypes(
   queryTypeName: string | null,
   mutationTypeName: string | null,
   options?: RetrieveOptions,
+  commentIndex?: CommentIndex,
 ): RelevantSchemaInfo {
   const {
     minScore = 0,
@@ -436,6 +502,7 @@ export function retrieveRelevantTypes(
     includeRootTypes = false,
     includeReferences = true,
     splitCamelCase = false,
+    searchWithinComments = true,
   } = options ?? {};
 
   // Score each type by relevance
@@ -460,6 +527,23 @@ export function retrieveRelevantTypes(
         // Accumulate scores for types that match multiple tokens
         const currentScore = typeScores.get(typeName) ?? 0;
         typeScores.set(typeName, currentScore + score);
+      }
+    }
+
+    // Search within comments if enabled
+    if (searchWithinComments && commentIndex) {
+      const commentMatches = commentIndex.get(tokenLower);
+      if (commentMatches) {
+        for (const match of Array.from(commentMatches)) {
+          const [typeName, fieldName] = match.includes(".")
+            ? match.split(".")
+            : [match, null];
+
+          // Comments get a lower score since they're less specific
+          const score = SCORE_FIELD_MATCH / 2;
+          const currentScore = typeScores.get(typeName) ?? 0;
+          typeScores.set(typeName, currentScore + score);
+        }
       }
     }
   }

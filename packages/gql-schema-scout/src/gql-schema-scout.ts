@@ -7,11 +7,17 @@ import {
   buildSymbolIndex,
   deserializeTypeIndex,
   deserializeSymbolIndex,
+  deserializeCommentIndex,
   retrieveRelevantTypes,
   type RetrieveOptions,
 } from "./build-lookups";
 import { SchemaResult } from "./schema-result";
-import type { SchemaLookups, TypeIndex, SymbolIndex } from "./types";
+import type {
+  SchemaLookups,
+  TypeIndex,
+  SymbolIndex,
+  CommentIndex,
+} from "./types";
 
 /**
  * GQLSchemaScout - A fluent API for exploring GraphQL schemas
@@ -31,6 +37,7 @@ import type { SchemaLookups, TypeIndex, SymbolIndex } from "./types";
 export class GQLSchemaScout {
   private typeIndex: TypeIndex;
   private symbolIndex: SymbolIndex;
+  private commentIndex: CommentIndex;
   private queryTypeName: string | null;
   private mutationTypeName: string | null;
   private sdl: string | null;
@@ -38,12 +45,14 @@ export class GQLSchemaScout {
   private constructor(
     typeIndex: TypeIndex,
     symbolIndex: SymbolIndex,
+    commentIndex: CommentIndex,
     queryTypeName: string | null,
     mutationTypeName: string | null,
     sdl: string | null,
   ) {
     this.typeIndex = typeIndex;
     this.symbolIndex = symbolIndex;
+    this.commentIndex = commentIndex;
     this.queryTypeName = queryTypeName;
     this.mutationTypeName = mutationTypeName;
     this.sdl = sdl;
@@ -56,7 +65,7 @@ export class GQLSchemaScout {
     const ast = parse(sdl);
     const schema = buildASTSchema(ast);
     const typeIndex = buildTypeIndex(schema);
-    const symbolIndex = buildSymbolIndex(typeIndex, schema);
+    const { symbolIndex, commentIndex } = buildSymbolIndex(typeIndex, schema);
 
     const queryType = schema.getQueryType();
     const mutationType = schema.getMutationType();
@@ -64,6 +73,7 @@ export class GQLSchemaScout {
     return new GQLSchemaScout(
       typeIndex,
       symbolIndex,
+      commentIndex,
       queryType?.name ?? null,
       mutationType?.name ?? null,
       sdl,
@@ -84,10 +94,12 @@ export class GQLSchemaScout {
   static fromLookups(lookups: SchemaLookups): GQLSchemaScout {
     const typeIndex = deserializeTypeIndex(lookups.typeIndex);
     const symbolIndex = deserializeSymbolIndex(lookups.symbolIndex);
+    const commentIndex = deserializeCommentIndex(lookups.commentIndex);
 
     return new GQLSchemaScout(
       typeIndex,
       symbolIndex,
+      commentIndex,
       lookups.queryTypeName,
       lookups.mutationTypeName,
       null,
@@ -109,6 +121,7 @@ export class GQLSchemaScout {
       this.queryTypeName,
       this.mutationTypeName,
       options,
+      this.commentIndex,
     );
     return new SchemaResult(relevantTypes, this.typeIndex);
   }
@@ -150,6 +163,7 @@ export class GQLSchemaScout {
     return {
       typeIndex: this.serializeTypeIndex(),
       symbolIndex: this.serializeSymbolIndex(),
+      commentIndex: this.serializeCommentIndex(),
       queryTypeName: this.queryTypeName,
       mutationTypeName: this.mutationTypeName,
     };
@@ -166,6 +180,14 @@ export class GQLSchemaScout {
   private serializeSymbolIndex() {
     const result: Record<string, string[]> = {};
     for (const [key, value] of Array.from(this.symbolIndex)) {
+      result[key] = Array.from(value);
+    }
+    return result;
+  }
+
+  private serializeCommentIndex() {
+    const result: Record<string, string[]> = {};
+    for (const [key, value] of Array.from(this.commentIndex)) {
       result[key] = Array.from(value);
     }
     return result;

@@ -50,13 +50,16 @@ export type TypeNode = {
 
 export type TypeIndex = Map<string, TypeNode>;
 export type SymbolIndex = Map<string, Set<string>>;
+export type CommentIndex = Map<string, Set<string>>;
 
 export type SerializedTypeIndex = Record<string, TypeNode>;
 export type SerializedSymbolIndex = Record<string, string[]>;
+export type SerializedCommentIndex = Record<string, string[]>;
 
 export type SchemaLookups = {
   typeIndex: SerializedTypeIndex;
   symbolIndex: SerializedSymbolIndex;
+  commentIndex: SerializedCommentIndex;
   queryTypeName: string | null;
   mutationTypeName: string | null;
 };
