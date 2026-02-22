@@ -123,7 +123,11 @@ export class GQLSchemaScout {
       options,
       this.commentIndex,
     );
-    return new SchemaResult(relevantTypes, this.typeIndex);
+    return new SchemaResult(
+      relevantTypes,
+      this.typeIndex,
+      this.sdl?.length ?? null,
+    );
   }
 
   /**

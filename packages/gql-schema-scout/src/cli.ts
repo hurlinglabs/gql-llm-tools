@@ -90,13 +90,13 @@ program
         : result.asSDLString();
     console.log(output);
 
-    const pct = ((output.length / sdl.length) * 100).toFixed(1);
-    const reduction = (100 - parseFloat(pct)).toFixed(1);
+    const sizeInfo = result.getSizeInfo();
+    const { percentageOfOriginal: pct, reduction } = sizeInfo;
 
     console.log("\n" + "=".repeat(50));
     console.log(`\nSUMMARY: ${pct}% of original (${reduction}% reduction)`);
-    console.log(`  Original: ${sdl.length.toLocaleString()} chars`);
-    console.log(`  Output:   ${output.length.toLocaleString()} chars`);
+    console.log(`  Original: ${sizeInfo.originalSize.toLocaleString()} chars`);
+    console.log(`  Output:   ${sizeInfo.currentSize.toLocaleString()} chars`);
   });
 
 program.parse();
