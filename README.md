@@ -1,40 +1,38 @@
-# Turborepo kitchen sink starter
+# GQL LLM Tools
 
-This Turborepo starter is maintained by the Turborepo core team.
+Tools to help LLMs and agents work with GraphQL schemas and GraphQL backends.
 
-This example also shows how to use [Workspace Configurations](https://turborepo.dev/docs/core-concepts/monorepos/configuring-workspaces).
+## Packages
 
-## Using this example
+### `@gql-schema-scout`
 
-Run the following command:
+A tool that will return a subset of a GraphQL schema/introspection based of a query. This helps LLMs understand the structure of GraphQL APIs without bloating there context hugely with large GQL Schemas. 
 
-```sh
-npx create-turbo@latest -e kitchen-sink
+### Shared Configurations
+
+- `@hurlinglabs/config-eslint` - ESLint configurations
+- `@hurlinglabs/config-typescript` - TypeScript configurations
+- `@hurlinglabs/jest-presets` - Jest presets
+
+## Getting Started
+
+```bash
+# Install dependencies
+pnpm install
+
+# Build all packages
+pnpm build
+
+# Run tests
+pnpm test
+
+# Lint code
+pnpm lint
+
+# Type check
+pnpm check-types
 ```
 
-## What's inside?
+## Development
 
-This Turborepo includes the following packages and apps:
-
-### Apps and Packages
-
-- `api`: an [Express](https://expressjs.com/) server
-- `storefront`: a [Next.js](https://nextjs.org/) app
-- `admin`: a [Vite](https://vitejs.dev/) single page app
-- `blog`: a [Remix](https://remix.run/) blog
-- `@repo/eslint-config`: ESLint configurations used throughout the monorepo
-- `@repo/jest-presets`: Jest configurations
-- `@repo/logger`: isomorphic logger (a small wrapper around console.log)
-- `@repo/ui`: a dummy React UI library (which contains `<CounterButton>` and `<Link>` components)
-- `@repo/typescript-config`: tsconfig.json's used throughout the monorepo
-
-Each package and app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Jest](https://jestjs.io) test runner for all things JavaScript
-- [Prettier](https://prettier.io) for code formatting
+This is a Turborepo monorepo using pnpm as the package manager.
