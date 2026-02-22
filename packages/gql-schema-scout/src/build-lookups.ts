@@ -23,7 +23,7 @@ import {
   isListType,
   isNamedType,
 } from "graphql";
-import { buildASTSchema, buildClientSchema } from "graphql/utilities";
+import { buildASTSchema, buildClientSchema } from "graphql/utilities/index.js";
 
 import type {
   TypeKind,
