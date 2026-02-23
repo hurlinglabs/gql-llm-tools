@@ -1,6 +1,6 @@
 {
   "name": "gql-schema-scout",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "Apache-2.0",
   "type": "module",
   "description": "Alias for @hurling/gql-schema-scout - WARNING: This is an alias package. Please use @hurling/gql-schema-scout for new projects. CLI users should install @hurling/gql-schema-scout directly.",

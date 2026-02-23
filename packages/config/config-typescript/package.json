@@ -1,6 +1,6 @@
 {
   "name": "@hurling/gql-llm-tools-config-tsconfig",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "MIT",
   "repository": "github:hurlinglabs/gql-llm-tools",
   "homepage": "https://github.com/hurlinglabs/gql-llm-tools/tree/main/packages/config-typescript",
