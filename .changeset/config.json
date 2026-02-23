@@ -6,7 +6,7 @@
     ["@hurling/gql-schema-scout", "gql-schema-scout"]
   ],
   "linked": [],
-  "access": "restricted",
+  "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "ignore": []
