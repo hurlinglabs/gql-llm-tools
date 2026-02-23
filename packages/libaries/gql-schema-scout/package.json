@@ -49,7 +49,7 @@
     "test": "jest"
   },
   "jest": {
-    "preset": "@hurling/gql-llm-tools-config-jest"
+    "preset": "../../config/jest-presets/node/jest-preset.mjs"
   },
   "dependencies": {
     "commander": "^12.0.0",

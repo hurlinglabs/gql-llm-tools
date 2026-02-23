@@ -45,9 +45,6 @@ importers:
       '@hurling/gql-llm-tools-config-tsconfig':
         specifier: workspace:*
         version: link:../../config/config-typescript
-      '@jest/globals':
-        specifier: ^30.2.0
-        version: 30.2.0
       '@types/node':
         specifier: ^22.15.3
         version: 22.19.11
@@ -57,9 +54,6 @@ importers:
       eslint:
         specifier: ^9.39.0
         version: 9.39.3
-      jest:
-        specifier: ^30.2.0
-        version: 30.2.0(@types/node@22.19.11)(node-notifier@10.0.1)
       typescript:
         specifier: 5.9.3
         version: 5.9.3

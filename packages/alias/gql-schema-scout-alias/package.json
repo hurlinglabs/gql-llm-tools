@@ -31,8 +31,7 @@
     "build": "bunchee",
     "dev": "bunchee --watch",
     "lint": "eslint src/",
-    "check-types": "tsc --noEmit",
-    "test": "jest"
+    "check-types": "tsc --noEmit"
   },
   "peerDependencies": {
     "@hurling/gql-schema-scout": "workspace:*"
@@ -41,13 +40,11 @@
     "@hurling/gql-schema-scout": "workspace:*"
   },
   "devDependencies": {
-    "@jest/globals": "^30.2.0",
     "@hurling/gql-llm-tools-config-tsconfig": "workspace:*",
     "@hurling/gql-llm-tools-config-eslint": "workspace:*",
     "@types/node": "^22.15.3",
     "bunchee": "^6.4.0",
     "eslint": "^9.39.0",
-    "jest": "^30.2.0",
     "typescript": "5.9.3"
   }
 }
