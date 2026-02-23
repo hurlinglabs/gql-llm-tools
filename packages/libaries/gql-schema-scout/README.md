@@ -19,7 +19,7 @@ npm install @hurling/gql-schema-scout
 ## CLI
 
 ```bash
-@hurling/gql-scout [options] [query]
+npx @hurling/gql-schema-scout [options] [query]
 ```
 
 ### Options
@@ -32,7 +32,7 @@ npm install @hurling/gql-schema-scout
 ### Example
 
 ```bash
-@hurling/gql-scout --schema https://docs.github.com/public/fpt/schema.docs.graphql "issue"
+npx @hurling/gql-schema-scout --schema https://docs.github.com/public/fpt/schema.docs.graphql "issue"
 ```
 
 Output:

@@ -13,7 +13,7 @@
   "module": "./dist/es/index.js",
   "types": "./dist/es/index.d.ts",
   "bin": {
-    "gql-scout": "./dist/es/cli.js"
+    "gql-schema-scout": "./dist/es/cli.js"
   },
   "exports": {
     ".": {

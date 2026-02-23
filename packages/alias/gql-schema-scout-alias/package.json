@@ -11,6 +11,9 @@
     "dist",
     "preinstall-alert.txt"
   ],
+  "bin": {
+    "gql-schema-scout": "./dist/es/cli.js"
+  },
   "main": "./dist/es/index.js",
   "module": "./dist/es/index.js",
   "types": "./dist/es/index.d.ts",
@@ -23,6 +26,16 @@
       "require": {
         "types": "./dist/cjs/index.d.cts",
         "default": "./dist/cjs/index.cjs"
+      }
+    },
+    "./cli": {
+      "import": {
+        "types": "./dist/es/cli.d.ts",
+        "default": "./dist/es/cli.js"
+      },
+      "require": {
+        "types": "./dist/cjs/cli.d.cts",
+        "default": "./dist/cjs/cli.cjs"
       }
     }
   },
@@ -37,7 +50,8 @@
     "@hurling/gql-schema-scout": "workspace:*"
   },
   "dependencies": {
-    "@hurling/gql-schema-scout": "workspace:*"
+    "@hurling/gql-schema-scout": "workspace:*",
+    "commander": "^12.0.0"
   },
   "devDependencies": {
     "@hurling/gql-llm-tools-config-tsconfig": "workspace:*",

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-import { Command } from "commander";
-import { GQLSchemaScout } from "./index.js";
+import { GQLSchemaScout } from "@hurling/gql-schema-scout";
 import { readFileSync } from "node:fs";
+import { Command } from "commander";
 
 const program = new Command();
 
@@ -31,7 +31,7 @@ program
 
     if (!query) {
       console.error("Error: Query is required");
-      console.error("Usage: gql-scout [options] [query]");
+      console.error("Usage: gql-schema-scout [options] [query]");
       process.exit(1);
     }
 

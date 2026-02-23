@@ -41,6 +41,9 @@ importers:
       '@hurling/gql-schema-scout':
         specifier: workspace:*
         version: link:../../libaries/gql-schema-scout
+      commander:
+        specifier: ^12.0.0
+        version: 12.1.0
     devDependencies:
       '@hurling/gql-llm-tools-config-eslint':
         specifier: workspace:*
