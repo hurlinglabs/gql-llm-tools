@@ -1,6 +1,7 @@
 {
   "name": "@hurling/gql-llm-tools-config-eslint",
   "version": "0.0.2",
+  "private": false,
   "license": "MIT",
   "type": "module",
   "repository": "github:hurlinglabs/gql-llm-tools",
