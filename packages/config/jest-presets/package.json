@@ -1,5 +1,5 @@
 {
-  "name": "@repo/jest-presets",
+  "name": "@hurling/gql-llm-tools-config-jest",
   "version": "0.0.0",
   "private": true,
   "license": "MIT",

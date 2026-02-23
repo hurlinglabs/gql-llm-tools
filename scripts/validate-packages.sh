@@ -2,8 +2,10 @@
 set -e
 
 PACKAGES=(
-  "packages/gql-schema-scout"
-  "packages-alias/gql-schema-scout-alias"
+  # Libraries
+  "packages/libaries/gql-schema-scout"
+  # Aliases
+  "packages/alias/gql-schema-scout-alias"
 )
 
 echo "Validating packages..."
