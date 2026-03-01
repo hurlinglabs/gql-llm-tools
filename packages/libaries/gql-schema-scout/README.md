@@ -1,5 +1,7 @@
 # @hurling/gql-schema-scout
 
+> **Beta Notice:** This package is in beta (pre-1.0.0). The API and interface may change between minor/patch versions without notice. A stable interface will be guaranteed from version 1.0.0 onwards.
+
 A lightweight GraphQL schema exploration library designed for LLM/AI applications. It enables intelligent, context-aware retrieval of schema types based on natural language queries.
 
 ## Features
@@ -277,7 +279,3 @@ function generateDocs(query: string): string {
 MIT
 
 ---
-
-# @hurling/gql-schema-scout
-
-A lightweight GraphQL schema exploration library designed for LLM/AI applications. It enables intelligent, context-aware retrieval of schema types based on natural language queries.
