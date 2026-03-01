@@ -52,6 +52,7 @@
     "preset": "../../config/jest-presets/node/jest-preset.mjs"
   },
   "dependencies": {
+    "@swc/helpers": "^0.5.15",
     "commander": "^12.0.0",
     "graphql": "^16.10.0"
   },
