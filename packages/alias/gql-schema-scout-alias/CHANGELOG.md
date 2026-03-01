@@ -1,5 +1,12 @@
 # gql-schema-scout
 
+## 0.0.7
+
+### Patch Changes
+
+- Updated dependencies
+  - @hurling/gql-schema-scout@0.0.7
+
 ## 0.0.6
 
 ### Patch Changes
