@@ -30,6 +30,35 @@ Requirements:
 
 ---
 
+## CLI
+
+The package also includes a CLI for searching GraphQL schemas directly from the terminal.
+
+```bash
+npx @hurling/gql-schema-scout [options] [query]
+```
+
+### Options
+
+| Option                      | Description                                              |
+| --------------------------- | -------------------------------------------------------- |
+| `-s, --schema <path>`       | Path to GraphQL schema file or URL (required)            |
+| `-m, --minScore <number>`   | Minimum relevance score (default: 0)                     |
+| `-r, --maxResults <number>` | Maximum number of types to return                        |
+| `--splitCamelCase`          | Split camelCase words into tokens                        |
+| `--noExpandRefs`            | Don't expand type references                             |
+| `--noRootTypes`             | Don't include root types (Query, Mutation, Subscription) |
+| `--noComments`              | Don't search within field/type descriptions              |
+| `--output <type>`           | Output format: `sdl` or `minified` (default: `sdl`)      |
+
+### Example
+
+```bash
+npx @hurling/gql-schema-scout --schema https://docs.github.com/public/fpt/schema.docs.graphql "issue"
+```
+
+---
+
 ## Quick Start
 
 ```typescript
@@ -83,7 +112,7 @@ console.log(result.asSDLString());
 
 // Or minified version
 console.log(result.asMinified());
-````
+```
 
 **Output:**
 
@@ -102,7 +131,7 @@ type CreateUserInput {
   name: String!
   email: String!
 }
-````
+```
 
 ---
 
@@ -183,8 +212,8 @@ console.log(result.asMinified());
 
 // With options
 const exactResult = scout.retrieveRelevantSchema("products", {
-  minScore: 100,          // Only exact matches
-  splitCamelCase: true,   // Enable camelCase splitting
+  minScore: 100, // Only exact matches
+  splitCamelCase: true, // Enable camelCase splitting
   includeRootTypes: true, // Include Query with filtered fields
 });
 ```
@@ -378,12 +407,12 @@ const scout = GQLSchemaScout.fromLookups(lookups);
 
 **Instance Methods:**
 
-| Method                                    | Returns        | Description                                           |
-| ----------------------------------------- | -------------- | ----------------------------------------------------- |
-| `retrieveRelevantSchema(input, options?)` | `SchemaResult` | Get relevant schema types as SchemaResult              |
-| `getTypeIndex()`                          | `TypeIndex`    | Raw Map of type names to TypeNodes                    |
-| `getSymbolIndex()`                        | `SymbolIndex`  | Raw Map of tokens to type names                       |
-| `getSDL()`                                | `string`       | Original SDL (only available if created with fromSDL) |
+| Method                                    | Returns         | Description                                           |
+| ----------------------------------------- | --------------- | ----------------------------------------------------- |
+| `retrieveRelevantSchema(input, options?)` | `SchemaResult`  | Get relevant schema types as SchemaResult             |
+| `getTypeIndex()`                          | `TypeIndex`     | Raw Map of type names to TypeNodes                    |
+| `getSymbolIndex()`                        | `SymbolIndex`   | Raw Map of tokens to type names                       |
+| `getSDL()`                                | `string`        | Original SDL (only available if created with fromSDL) |
 | `getLookups()`                            | `SchemaLookups` | Serializable lookups object                           |
 
 #### RetrieveOptions

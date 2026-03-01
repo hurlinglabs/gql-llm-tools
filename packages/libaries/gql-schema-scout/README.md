@@ -26,8 +26,12 @@ npx @hurling/gql-schema-scout [options] [query]
 
 - `-m, --minScore <number>` - Minimum relevance score (default: 0)
 - `-r, --maxResults <number>` - Maximum number of types to return
-- `-s, --schema <path>` - Path to GraphQL schema file or URL (default: GitHub schema)
+- `-s, --schema <path>` - Path to GraphQL schema file or URL (required)
 - `--splitCamelCase` - Split camelCase words into tokens
+- `--noExpandRefs` - Don't expand type references
+- `--noRootTypes` - Don't include root types (Query, Mutation, Subscription)
+- `--noComments` - Don't search within field/type descriptions
+- `--output <type>` - Output format: `sdl` or `minified` (default: `sdl`)
 
 ### Example
 
