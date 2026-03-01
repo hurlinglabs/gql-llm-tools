@@ -1,5 +1,11 @@
 # @hurling/gql-schema-scout
 
+## 0.0.4
+
+### Patch Changes
+
+- isolate packages
+
 ## 0.0.3
 
 ### Patch Changes
