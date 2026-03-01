@@ -5,6 +5,12 @@ on:
     tags:
       - "@hurling/gql-schema-scout@*"
       - "gql-schema-scout@*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to publish (e.g., 1.0.0)"
+        required: true
+        type: string
 
 jobs:
   publish:
@@ -20,8 +26,12 @@ jobs:
       - name: Get version from tag
         id: version
         run: |
-          TAG=${GITHUB_REF#refs/tags/}
-          VERSION=${TAG#*@}
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            TAG=${GITHUB_REF#refs/tags/}
+            VERSION=${TAG#*@}
+          fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm
@@ -48,7 +58,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          echo "//registry.npmjs.org=${NODE_AUTH_TOKEN/:_authToken}" > .npmrc
+          echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > .npmrc
           npm publish --access public
 
       - name: Publish gql-schema-scout (alias)
@@ -57,4 +67,4 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           npm pkg set name="gql-schema-scout"
-          npm publish --access public
+          npm publish --access public --force
