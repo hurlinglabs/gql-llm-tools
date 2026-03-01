@@ -43,6 +43,9 @@ jobs:
           node-version: "20"
           cache: "pnpm"
 
+      - name: Install npm v11
+        run: npm install -g npm@11
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -55,16 +58,12 @@ jobs:
 
       - name: Publish @hurling/gql-schema-scout
         working-directory: packages/libaries/gql-schema-scout/isolate
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > .npmrc
-          npm publish --access public
+        run: npm publish --access public
+
+      - name: Prepare alias package
+        working-directory: packages/libaries/gql-schema-scout/isolate
+        run: npm pkg set name="gql-schema-scout"
 
       - name: Publish gql-schema-scout (alias)
         working-directory: packages/libaries/gql-schema-scout/isolate
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          npm pkg set name="gql-schema-scout"
-          npm publish --access public --force
+        run: npm publish --access public --force
