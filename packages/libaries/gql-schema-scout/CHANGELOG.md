@@ -1,5 +1,11 @@
 # @hurling/gql-schema-scout
 
+## 0.0.5
+
+### Patch Changes
+
+- test deploy
+
 ## 0.0.4
 
 ### Patch Changes
