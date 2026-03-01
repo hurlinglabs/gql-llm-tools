@@ -69,7 +69,7 @@ describe("GQLSchemaScout", () => {
     it("includes Query and Mutation types when requested", () => {
       const scout = GQLSchemaScout.fromSDL(TEST_SCHEMA);
       const result = scout.retrieveRelevantSchema("anything", {
-        includeRootTypes: true,
+        skipRootTypes: false,
       });
 
       const sdl = result.asSDLString();
@@ -87,7 +87,7 @@ describe("GQLSchemaScout", () => {
     it("retrieves input types when querying mutations", () => {
       const scout = GQLSchemaScout.fromSDL(TEST_SCHEMA);
       const result = scout.retrieveRelevantSchema("create user", {
-        includeRootTypes: true,
+        skipRootTypes: false,
       });
 
       expect(result.asSDLString()).toContain("CreateUserInput");
@@ -108,6 +108,7 @@ describe("GQLSchemaScout", () => {
       const scout = GQLSchemaScout.fromSDL(TEST_SCHEMA);
       const result = scout.retrieveRelevantSchema("user post", {
         maxResults: 1,
+        skipRootTypes: true,
       });
 
       // Should only have 1 primary type
@@ -134,11 +135,11 @@ describe("GQLSchemaScout", () => {
       expect(minified).toContain("@hurling/gql-schema-scout");
     });
 
-    it("excludes referenced types when includeReferences is false", () => {
+    it("excludes referenced types when expandRefs is false", () => {
       const scout = GQLSchemaScout.fromSDL(TEST_SCHEMA);
       const result = scout.retrieveRelevantSchema("posts", {
-        includeReferences: false,
-        includeRootTypes: true,
+        expandRefs: false,
+        skipRootTypes: false,
       });
 
       const sdl = result.asSDLString();
@@ -149,7 +150,8 @@ describe("GQLSchemaScout", () => {
     it("includes referenced types in output by default", () => {
       const scout = GQLSchemaScout.fromSDL(TEST_SCHEMA);
       const result = scout.retrieveRelevantSchema("posts", {
-        includeRootTypes: true,
+        skipRootTypes: false,
+        expandRefs: true,
       });
 
       const sdl = result.asSDLString();
@@ -157,10 +159,10 @@ describe("GQLSchemaScout", () => {
       expect(sdl).toContain("type User");
     });
 
-    it("filters root type fields when includeRootTypes is true", () => {
+    it("filters root type fields when skipRootTypes is false", () => {
       const scout = GQLSchemaScout.fromSDL(TEST_SCHEMA);
       const result = scout.retrieveRelevantSchema("user", {
-        includeRootTypes: true,
+        skipRootTypes: false,
       });
 
       const sdl = result.asSDLString();
@@ -185,8 +187,8 @@ describe("GQLSchemaScout", () => {
         }
       `;
       const scout = GQLSchemaScout.fromSDL(camelSchema);
-      
-      // With splitCamelCase - should match profileData 
+
+      // With splitCamelCase - should match profileData
       const result = scout.retrieveRelevantSchema("profileData", {
         splitCamelCase: true,
       });

@@ -77,9 +77,9 @@ program
         ? parseInt(options.maxResults, 10)
         : undefined,
       splitCamelCase: options.splitCamelCase,
-      includeRootTypes: options.rootTypes,
-      includeReferences: options.expandRefs,
-      searchWithinComments: !options.noComments,
+      skipRootTypes: options.skipRootTypes,
+      expandRefs: options.expandRefs,
+      searchComments: !options.noComments,
     });
 
     const output =

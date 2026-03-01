@@ -59,22 +59,25 @@ export type RetrieveOptions = {
   maxResults?: number;
 
   /**
-   * Whether to include Query and Mutation root types.
-   * Only matching fields will be included from these types.
+   * Whether to skip Query and Mutation root types.
+   * When false (default), matching fields from root types are included.
+   * Corresponds to CLI: --skipRootTypes
    * @default false
    */
-  includeRootTypes?: boolean;
+  skipRootTypes?: boolean;
 
   /**
-   * Whether to include types referenced by matched types.
-   * Referenced types will be listed but not fully expanded.
-   * @default true
+   * Whether to expand type references.
+   * When enabled, referenced types will be fully expanded in the output.
+   * Corresponds to CLI: --expandRefs
+   * @default false
    */
-  includeReferences?: boolean;
+  expandRefs?: boolean;
 
   /**
    * Whether to split camelCase words into individual tokens.
    * e.g., "BetNotification" → ["bet", "notification"]
+   * Corresponds to CLI: --splitCamelCase
    * @default false
    */
   splitCamelCase?: boolean;
@@ -82,9 +85,10 @@ export type RetrieveOptions = {
   /**
    * Whether to search within field, type, and argument descriptions/comments.
    * When enabled, query terms that match descriptions will also be considered relevant.
+   * Corresponds to CLI: --noComments (set to false to disable)
    * @default true
    */
-  searchWithinComments?: boolean;
+  searchComments?: boolean;
 };
 
 /**
@@ -499,10 +503,10 @@ export function retrieveRelevantTypes(
   const {
     minScore = 0,
     maxResults,
-    includeRootTypes = false,
-    includeReferences = true,
+    skipRootTypes = false,
+    expandRefs = false,
     splitCamelCase = false,
-    searchWithinComments = true,
+    searchComments = true,
   } = options ?? {};
 
   // Score each type by relevance
@@ -531,7 +535,7 @@ export function retrieveRelevantTypes(
     }
 
     // Search within comments if enabled
-    if (searchWithinComments && commentIndex) {
+    if (searchComments && commentIndex) {
       const commentMatches = commentIndex.get(tokenLower);
       if (commentMatches) {
         for (const match of Array.from(commentMatches)) {
@@ -563,7 +567,7 @@ export function retrieveRelevantTypes(
   // Expand to referenced types
   const referencedTypes = new Set<string>();
 
-  if (includeReferences) {
+  if (expandRefs) {
     for (const typeName of Array.from(primaryTypes)) {
       const typeNode = typeIndex.get(typeName);
       if (typeNode) {
@@ -578,7 +582,7 @@ export function retrieveRelevantTypes(
 
   // Root types (Query/Mutation)
   const rootTypes = new Set<string>();
-  if (includeRootTypes) {
+  if (!skipRootTypes) {
     if (queryTypeName && typeIndex.has(queryTypeName)) {
       rootTypes.add(queryTypeName);
     }

@@ -77,7 +77,7 @@ export class SchemaResult {
         `# ⚠ ${refCount} referenced type${refCount > 1 ? "s" : ""} not fully defined.`,
       );
       lines.push(
-        `# To see their full definition, call retrieveRelevantSchema() with includeReferences: true`,
+        `# To see their full definition, call retrieveRelevantSchema() with expandRefs: true`,
       );
       lines.push("");
     }
@@ -109,7 +109,7 @@ export class SchemaResult {
     if (referencedTypes.size > 0) {
       const refCount = referencedTypes.size;
       parts.push(
-        `# ⚠ ${refCount} ref${refCount > 1 ? "s" : ""} not defined (use includeReferences: true)`,
+        `# ⚠ ${refCount} ref${refCount > 1 ? "s" : ""} not defined (use expandRefs: true)`,
       );
     }
 
@@ -144,7 +144,7 @@ export class SchemaResult {
         `# ⚠ ${refCount} referenced type${refCount > 1 ? "s" : ""} not fully defined.`,
       );
       lines.push(
-        `# To see their full definition, call retrieveRelevantSchema() with includeReferences: true`,
+        `# To see their full definition, call retrieveRelevantSchema() with expandRefs: true`,
       );
       lines.push("");
     }

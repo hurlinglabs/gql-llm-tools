@@ -17,10 +17,11 @@ program
   .option("-m, --minScore <number>", "Minimum relevance score", "0")
   .option("-r, --maxResults <number>", "Maximum number of types to return")
   .option("--splitCamelCase", "Split camelCase words into tokens")
-  .option("--noExpandRefs", "Don't expand type references")
+  .option("--expandRefs", "Expand type references", false)
   .option(
-    "--noRootTypes",
-    "Don't include root types (Query, Mutation, Subscription)",
+    "--skipRootTypes",
+    "Skip root types (Query, Mutation, Subscription)",
+    false,
   )
   .option("--noComments", "Don't search within field/type descriptions")
   .option("--output <type>", "Output format: sdl|minified", "sdl")
@@ -67,7 +68,7 @@ program
 
     console.log(`Query: "${query}"`);
     console.log(
-      `Options: minScore=${options.minScore}, maxResults=${options.maxResults || "unlimited"}, splitCamelCase=${options.splitCamelCase}, includeReferences=${options.expandRefs}, includeRootTypes=${options.rootTypes}, searchComments=${!options.noComments}`,
+      `Options: minScore=${options.minScore}, maxResults=${options.maxResults || "unlimited"}, splitCamelCase=${options.splitCamelCase}, expandRefs=${options.expandRefs}, skipRootTypes=${options.skipRootTypes}, searchComments=${!options.noComments}`,
     );
     console.log("=".repeat(50) + "\n");
 
@@ -77,9 +78,9 @@ program
         ? parseInt(options.maxResults, 10)
         : undefined,
       splitCamelCase: options.splitCamelCase,
-      includeRootTypes: options.rootTypes,
-      includeReferences: options.expandRefs,
-      searchWithinComments: !options.noComments,
+      skipRootTypes: options.skipRootTypes,
+      expandRefs: options.expandRefs,
+      searchComments: !options.noComments,
     });
 
     const output =
