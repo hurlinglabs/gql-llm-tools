@@ -1,5 +1,11 @@
 # @hurling/gql-schema-scout
 
+## 0.0.8
+
+### Patch Changes
+
+- change JS interface to line up with CLI interface and added CLI tests
+
 ## 0.0.7
 
 ### Patch Changes
