@@ -51,7 +51,7 @@ jobs:
 
       - name: Isolate package
         working-directory: packages/libaries/gql-schema-scout
-        run: pnpm exec isolate-package isolate
+        run: pnpm exec isolate
 
       - name: Publish @hurling/gql-schema-scout
         working-directory: packages/libaries/gql-schema-scout/isolate
