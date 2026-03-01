@@ -1,5 +1,11 @@
 # @hurling/gql-schema-scout
 
+## 0.0.9
+
+### Patch Changes
+
+- repubhish the alias package
+
 ## 0.0.8
 
 ### Patch Changes
