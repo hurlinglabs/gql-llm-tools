@@ -4,7 +4,6 @@ on:
   push:
     tags:
       - "@hurling/gql-schema-scout@*"
-      - "gql-schema-scout@*"
   workflow_dispatch:
     inputs:
       version:
