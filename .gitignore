@@ -10,3 +10,6 @@ dist-ssr
 .cache
 server/dist
 public/dist
+
+# isolated package generated
+packages/libaries/gql-schema-scout/isolate/

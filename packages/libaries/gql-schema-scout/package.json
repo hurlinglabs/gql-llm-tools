@@ -62,6 +62,7 @@
     "@types/node": "^22.15.3",
     "bunchee": "^6.4.0",
     "eslint": "^9.39.0",
+    "isolate-package": "^1.28.2",
     "jest": "^30.2.0",
     "typescript": "5.9.3"
   }
