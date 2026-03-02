@@ -1,5 +1,11 @@
 # @hurling/gql-schema-scout
 
+## 0.0.10
+
+### Patch Changes
+
+- fix homepage and keywords
+
 ## 0.0.9
 
 ### Patch Changes
