@@ -4,7 +4,7 @@
   "license": "Apache-2.0",
   "type": "module",
   "repository": "github:hurlinglabs/gql-llm-tools",
-  "homepage": "https://github.com/hurlinglabs/gql-llm-tools/tree/main/packages/gql-schema-scout",
+  "homepage": "https://github.com/hurlinglabs/gql-llm-tools/tree/main/packages/libaries/gql-schema-scout",
   "bugs": "https://github.com/hurlinglabs/gql-llm-tools/issues",
   "files": [
     "dist"
