@@ -4,6 +4,21 @@
   "license": "Apache-2.0",
   "type": "module",
   "repository": "github:hurlinglabs/gql-llm-tools",
+  "keywords": [
+    "graphql",
+    "llm",
+    "ai",
+    "agent",
+    "schema",
+    "mcp",
+    "model-context-protocol",
+    "gpt",
+    "chatgpt",
+    "openai",
+    "anthropic",
+    "context-window",
+    "schema-exploration"
+  ],
   "homepage": "https://github.com/hurlinglabs/gql-llm-tools/tree/main/packages/libaries/gql-schema-scout",
   "bugs": "https://github.com/hurlinglabs/gql-llm-tools/issues",
   "files": [
